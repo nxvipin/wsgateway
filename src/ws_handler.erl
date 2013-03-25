@@ -23,7 +23,7 @@ websocket_handle(_Data, Req, State) ->
 websocket_info({timeout, _Ref, Msg}, Req, State) ->
 	{reply, {text, Msg}, Req, State};
 websocket_info(Msg, Req, State)->
-	{reply, {text, <<Msg/binary>>}, Req, State};
+	{reply, {text, <<Msg/binary>>}, Req, State}.
 
 
 websocket_terminate(_Reason, _Req, _State) ->
