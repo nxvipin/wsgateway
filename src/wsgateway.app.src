@@ -1,0 +1,12 @@
+{application, wsgateway,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { wsgateway_app, []}},
+  {env, []}
+ ]}.
