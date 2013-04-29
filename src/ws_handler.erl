@@ -8,23 +8,32 @@
 -export([websocket_terminate/3]).
 
 init({tcp, http}, _Req, _Opts) ->
-	{upgrade, protocol, cowboy_websocket}.
+    {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_TransportName, Req, _Opts) ->
-	{ok, Req, undefined_state}.
+    {ok, Req, undefined_state}.
 
-websocket_handle({text, <<"processid">>}, Req, State)->
-	{reply, {text, list_to_binary(pid_to_list(self()))}, Req, State};
+websocket_handle({text, <<"register:",Username/binary>>}, Req, State) ->
+    UserProcess = list_to_binary(pid_to_list(self())),
+    gen_event:notify({global, presence_manager},
+		     <<"register",
+		       ":username:",Username/binary,
+		       ":userprocess:",UserProcess/binary>>),
+    {reply, {text, Username}, Req, State};
+
 websocket_handle({text, Msg}, Req, State) ->
-	{reply, {text, <<Msg/binary >>}, Req, State};
+    {reply, {text, <<Msg/binary >>}, Req, State};
+
 websocket_handle(_Data, Req, State) ->
-	{ok, Req, State}.
+    {ok, {text, _Data}, Req, State}.
 
 websocket_info({timeout, _Ref, Msg}, Req, State) ->
-	{reply, {text, Msg}, Req, State};
+    {reply, {text, Msg}, Req, State};
+
 websocket_info(Msg, Req, State)->
-	{reply, {text, <<Msg/binary>>}, Req, State}.
+    {reply, {text, <<Msg/binary>>}, Req, State}.
 
 
 websocket_terminate(_Reason, _Req, _State) ->
-	ok.
+    ok.
+
