@@ -39,5 +39,5 @@ websocket_info(Msg, Req, State)->
 websocket_terminate(_Reason, _Req, _State) ->
 	UserProcess = list_to_binary(pid_to_list(self())),
 	gen_event:notify(?PRESENCE,
-					 <<"disconnect:",":userprocess:",UserProcess/binary>>),
+					 <<"disconnect",":userprocess:",UserProcess/binary>>),
     ok.
