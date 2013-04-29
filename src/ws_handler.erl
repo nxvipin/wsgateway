@@ -7,6 +7,8 @@
 -export([websocket_info/3]).
 -export([websocket_terminate/3]).
 
+-define(PRESENCE, {global, presence_manager}).
+
 init({tcp, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
@@ -15,10 +17,10 @@ websocket_init(_TransportName, Req, _Opts) ->
 
 websocket_handle({text, <<"register:",Username/binary>>}, Req, State) ->
     UserProcess = list_to_binary(pid_to_list(self())),
-    gen_event:notify({global, presence_manager},
-		     <<"register",
-		       ":username:",Username/binary,
-		       ":userprocess:",UserProcess/binary>>),
+    gen_event:notify(?PRESENCE,
+					 <<"register",
+					   ":username:",Username/binary,
+					   ":userprocess:",UserProcess/binary>>),
     {reply, {text, Username}, Req, State};
 
 websocket_handle({text, Msg}, Req, State) ->
@@ -35,5 +37,7 @@ websocket_info(Msg, Req, State)->
 
 
 websocket_terminate(_Reason, _Req, _State) ->
+	UserProcess = list_to_binary(pid_to_list(self())),
+	gen_event:notify(?PRESENCE,
+					 <<"disconnect:",":userprocess:",UserProcess/binary>>),
     ok.
-
