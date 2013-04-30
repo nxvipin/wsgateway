@@ -30,7 +30,7 @@ websocket_handle({text, <<"subscribe:",Channel/binary>>}, Req, State) ->
 					 <<"subscribe",
 					   ":channel:",Channel/binary,
 					   ":userprocess:",UserProcess/binary>>),
-	{reply, {text, ok}, Req, State}.
+	{reply, {text, ok}, Req, State};
 
 websocket_handle({text, Msg}, Req, State) ->
     {reply, {text, <<Msg/binary >>}, Req, State};
