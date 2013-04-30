@@ -8,7 +8,7 @@
 -export([websocket_terminate/3]).
 
 -define(PRESENCE, {global, presence_handler}).
--define(MESSAGE, {global, message_handler}).
+-define(CHANNEL, {global, channel_handler}).
 
 init({tcp, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
@@ -23,6 +23,14 @@ websocket_handle({text, <<"register:",Username/binary>>}, Req, State) ->
 					   ":username:",Username/binary,
 					   ":userprocess:",UserProcess/binary>>),
     {reply, {text, Username}, Req, State};
+
+websocket_handle({text, <<"subscribe:",Channel/binary>>}, Req, State) ->
+	UserProcess = list_to_binary(pid_to_list(self())),
+	gen_event:notify(?CHANNEL,
+					 <<"subscribe",
+					   ":channel:",Channel/binary,
+					   ":userprocess:",UserProcess/binary>>),
+	{reply, {text, ok}, Req, State}.
 
 websocket_handle({text, Msg}, Req, State) ->
     {reply, {text, <<Msg/binary >>}, Req, State};
